@@ -1,0 +1,820 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "prohandel API",
+    "description": "Test",
+    "termsOfService": "https://prohandel.de/terms",
+    "contact": {
+      "name": "Example Contact",
+      "url": "https://prohandel.de/contact"
+    },
+    "license": {
+      "name": "Example License",
+      "url": "https://prohandel.de/license"
+    },
+    "version": "v3"
+  },
+  "paths": {
+    "/api/v3/customer/email/{email}": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "operationId": "e570d734-04f5-425c-ac19-dee02f10e1fa",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "continuationToken",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "continuationToken"
+            }
+          },
+          {
+            "name": "resultsPerPage",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDTOMultiResultModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDTOMultiResultModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDTOMultiResultModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v3/customer/{id}": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "operationId": "44cb9658-c77f-45bc-b31c-45eadc182343",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDTOSingleResultModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDTOSingleResultModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDTOSingleResultModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v3/customer/number/{number}": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "operationId": "c52848af-9fde-44c4-841b-18e11904a303",
+        "parameters": [
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDTOSingleResultModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDTOSingleResultModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDTOSingleResultModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v3/customer/changed/{from}/{to}": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "operationId": "d14ab828-9748-43e3-aa7a-4f7114ee9bc6",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "to",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "continuationToken",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "continuationToken"
+            }
+          },
+          {
+            "name": "resultsPerPage",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDTOChangesResultModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDTOChangesResultModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDTOChangesResultModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v3/customer": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "operationId": "ae89bc65-9dac-4206-b84b-8a4a1ef87bcd",
+        "parameters": [
+          {
+            "name": "continuationToken",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "continuationToken"
+            }
+          },
+          {
+            "name": "resultsPerPage",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDTOMultiResultModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDTOMultiResultModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDTOMultiResultModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BonusTypes": {
+        "enum": [
+          0,
+          1,
+          2,
+          4,
+          8
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "CustomerDTO": {
+        "type": "object",
+        "properties": {
+          "branchNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "isLockedForSelections": {
+            "type": "boolean"
+          },
+          "bankCode": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "signedDeclarationOfConsent": {
+            "type": "boolean"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "maritalStatus": {
+            "$ref": "#/components/schemas/MaritalStatus"
+          },
+          "fax": {
+            "type": "string",
+            "nullable": true
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "dateOfBirthSignificantOther": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "isBusiness": {
+            "type": "boolean"
+          },
+          "iban": {
+            "type": "string",
+            "nullable": true
+          },
+          "info1": {
+            "type": "string",
+            "nullable": true
+          },
+          "info2": {
+            "type": "string",
+            "nullable": true
+          },
+          "bankAccount": {
+            "type": "string",
+            "nullable": true
+          },
+          "gender": {
+            "$ref": "#/components/schemas/Gender"
+          },
+          "isStaff": {
+            "type": "boolean"
+          },
+          "mobilePhone": {
+            "type": "string",
+            "nullable": true
+          },
+          "subscriptionNewsletter": {
+            "type": "boolean"
+          },
+          "subscriptionNewsletterConfirmationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "zipCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "isLocked": {
+            "type": "boolean"
+          },
+          "street": {
+            "type": "string",
+            "nullable": true
+          },
+          "bic": {
+            "type": "string",
+            "nullable": true
+          },
+          "telephone": {
+            "type": "string",
+            "nullable": true
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "subscriptionAdvertising": {
+            "type": "boolean"
+          },
+          "countryNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "staffNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "selectionCriteria1": {
+            "type": "string",
+            "nullable": true
+          },
+          "selectionCriteria2": {
+            "type": "string",
+            "nullable": true
+          },
+          "selectionCriteria3": {
+            "type": "string",
+            "nullable": true
+          },
+          "selectionCriteria4": {
+            "type": "string",
+            "nullable": true
+          },
+          "selectionCriteria5": {
+            "type": "string",
+            "nullable": true
+          },
+          "selectionCriteria6": {
+            "type": "string",
+            "nullable": true
+          },
+          "selectionCriteria7": {
+            "type": "string",
+            "nullable": true
+          },
+          "selectionCriteria8": {
+            "type": "string",
+            "nullable": true
+          },
+          "selectionCriteria9": {
+            "type": "string",
+            "nullable": true
+          },
+          "vatNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "declarationsOfConsent": {
+            "$ref": "#/components/schemas/DeclarationOfConsent"
+          },
+          "groupNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "customerCard": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "webshopUser": {
+            "type": "string",
+            "nullable": true
+          },
+          "webshopUserPassword": {
+            "type": "string",
+            "nullable": true
+          },
+          "customerType": {
+            "type": "string",
+            "nullable": true
+          },
+          "poBox": {
+            "type": "string",
+            "nullable": true
+          },
+          "poBoxZipCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "telephoneSecondary": {
+            "type": "string",
+            "nullable": true
+          },
+          "mobilePhoneSecondary": {
+            "type": "string",
+            "nullable": true
+          },
+          "discountGroup": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "discountPercent": {
+            "type": "number",
+            "format": "double"
+          },
+          "bonusPercent": {
+            "type": "number",
+            "format": "double"
+          },
+          "familyNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "bonusType": {
+            "$ref": "#/components/schemas/BonusTypes"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "creationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "searchTerm": {
+            "type": "string",
+            "nullable": true
+          },
+          "personalSalutation": {
+            "type": "string",
+            "nullable": true
+          },
+          "name1": {
+            "type": "string",
+            "nullable": true
+          },
+          "name2": {
+            "type": "string",
+            "nullable": true
+          },
+          "name3": {
+            "type": "string",
+            "nullable": true
+          },
+          "salutation": {
+            "type": "string",
+            "nullable": true
+          },
+          "revenue": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "bonusValue": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "loyalityPoints": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lastChange": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "hasCustomerCard": {
+            "type": "boolean"
+          },
+          "customerCardPrintDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "inactiveFlag": {
+            "type": "boolean"
+          },
+          "lastBonusSettlementDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CustomerDTOChangesResultModel": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CustomerDTOTrackedChanges"
+          },
+          "continuationToken": {
+            "type": "string",
+            "format": "continuationToken",
+            "nullable": true
+          },
+          "resultsPerPage": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CustomerDTOMultiResultModel": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerDTO"
+            },
+            "nullable": true
+          },
+          "continuationToken": {
+            "type": "string",
+            "format": "continuationToken",
+            "nullable": true
+          },
+          "resultsPerPage": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CustomerDTOSingleResultModel": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CustomerDTO"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CustomerDTOTrackedChanges": {
+        "type": "object",
+        "properties": {
+          "created": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerDTO"
+            },
+            "nullable": true
+          },
+          "updated": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerDTO"
+            },
+            "nullable": true
+          },
+          "deleted": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerDTO"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DeclarationOfConsent": {
+        "enum": [
+          0,
+          1,
+          2,
+          4,
+          8
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "Gender": {
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "MaritalStatus": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": { }
+      }
+    }
+  }
+}
