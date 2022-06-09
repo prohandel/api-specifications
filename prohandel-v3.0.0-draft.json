@@ -20,11 +20,14 @@
         "tags": [
           "Customer"
         ],
+        "summary": "Get customers by email",
+        "description": "Get all customers that use the provided email address.",
         "operationId": "e570d734-04f5-425c-ac19-dee02f10e1fa",
         "parameters": [
           {
             "name": "email",
             "in": "path",
+            "description": "The email address to filter customers by.",
             "required": true,
             "schema": {
               "type": "string"
@@ -33,6 +36,7 @@
           {
             "name": "continuationToken",
             "in": "query",
+            "description": "Set the continuation token to from the previous request result to return the next page of results.",
             "schema": {
               "type": "string",
               "format": "continuationToken"
@@ -41,6 +45,7 @@
           {
             "name": "resultsPerPage",
             "in": "query",
+            "description": "Configures the amount of records returned per page (Default if ommitted: 10).",
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -96,16 +101,21 @@
         "tags": [
           "Customer"
         ],
+        "summary": "Get customer by ID",
+        "description": "Returns a customer by its unique GUID. If not customer exists with that GUID this returns 404 - Not found.",
         "operationId": "44cb9658-c77f-45bc-b31c-45eadc182343",
         "parameters": [
           {
             "name": "id",
             "in": "path",
+            "description": "The GUID of the customer to return.",
             "required": true,
             "schema": {
               "type": "string",
-              "format": "uuid"
-            }
+              "format": "uuid",
+              "example": "12345678-c77f-45bc-b31c-45eadc182343"
+            },
+            "example": "12345678-c77f-45bc-b31c-45eadc182343"
           }
         ],
         "responses": {
@@ -129,8 +139,28 @@
               }
             }
           },
+          "404": {
+            "description": "Customer not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "200": {
-            "description": "Success",
+            "description": "Successfully returning customer",
             "content": {
               "text/plain": {
                 "schema": {
@@ -157,11 +187,14 @@
         "tags": [
           "Customer"
         ],
+        "summary": "Get customer by number",
+        "description": "Retrieves the customer by its primary key. The primary key of a customer is its number field.",
         "operationId": "c52848af-9fde-44c4-841b-18e11904a303",
         "parameters": [
           {
             "name": "number",
             "in": "path",
+            "description": "The number of the customer. Can be found as number field in a customer object or as customerNumber if referenced from another entity.",
             "required": true,
             "schema": {
               "type": "integer",
@@ -172,6 +205,26 @@
         "responses": {
           "400": {
             "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
             "content": {
               "text/plain": {
                 "schema": {
@@ -218,11 +271,14 @@
         "tags": [
           "Customer"
         ],
+        "summary": "Get changed customers",
+        "description": "Retrieves all changes within the provided change ID range.\r\nChanges can be retrieved for up to 14 days before they are cleaned up.\r\nTherefore this endpoint is only suited for incremental synchronization.\r\nFor full snychronization use the get customers endpoint.\r\nFor how to handle data synchronization in general refer to the documentation section.",
         "operationId": "d14ab828-9748-43e3-aa7a-4f7114ee9bc6",
         "parameters": [
           {
             "name": "from",
             "in": "path",
+            "description": "Start of the change ID range (excluding from). Use the range end of the previous synchronization run as the start for the next.",
             "required": true,
             "schema": {
               "type": "integer",
@@ -232,6 +288,7 @@
           {
             "name": "to",
             "in": "path",
+            "description": "End of the change ID range. The current maximum change ID per database can be retrieved through an endpoint.",
             "required": true,
             "schema": {
               "type": "integer",
@@ -241,6 +298,7 @@
           {
             "name": "continuationToken",
             "in": "query",
+            "description": "Set the continuation token to from the previous request result to return the next page of results.",
             "schema": {
               "type": "string",
               "format": "continuationToken"
@@ -249,6 +307,7 @@
           {
             "name": "resultsPerPage",
             "in": "query",
+            "description": "Configures the amount of records returned per page (Default if ommitted: 10).",
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -304,11 +363,14 @@
         "tags": [
           "Customer"
         ],
+        "summary": "Get customers",
+        "description": "Returns all customers ordered by their customer number.",
         "operationId": "ae89bc65-9dac-4206-b84b-8a4a1ef87bcd",
         "parameters": [
           {
             "name": "continuationToken",
             "in": "query",
+            "description": "Set the continuation token to from the previous request result to return the next page of results.",
             "schema": {
               "type": "string",
               "format": "continuationToken"
@@ -317,6 +379,7 @@
           {
             "name": "resultsPerPage",
             "in": "query",
+            "description": "Configures the amount of records returned per page (Default if ommitted: 10).",
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -386,26 +449,32 @@
         "properties": {
           "branchNumber": {
             "type": "integer",
+            "description": "* Filiale-Nummer\r\n* Branch number",
             "format": "int32",
             "nullable": true
           },
           "title": {
             "type": "string",
+            "description": "* Titel des Kunden\r\n* Titel of the customer",
             "nullable": true
           },
           "isLockedForSelections": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "* Kennzeichent das angibt ob der Kunde für Auswahlen gesperrt ist\r\n* Flag that defines the customer as locked for selections"
           },
           "bankCode": {
             "type": "integer",
+            "description": "* Bankleitzahl\r\n* Bankcode",
             "format": "int32",
             "nullable": true
           },
           "signedDeclarationOfConsent": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "* Kennzeichen das angibt ob der Kunde eine Einverständnisserklärung unterschrieben hat\r\n* Flag that defines that the customer signed a declaration of consent"
           },
           "email": {
             "type": "string",
+            "description": "* E-Mail Adresse\r\n* E-Mail address",
             "nullable": true
           },
           "maritalStatus": {
@@ -413,136 +482,170 @@
           },
           "fax": {
             "type": "string",
+            "description": "* Fax-Nummer\r\n* Fax number",
             "nullable": true
           },
           "dateOfBirth": {
             "type": "string",
+            "description": "* Geburtsdatum\r\n* Date of birth",
             "format": "date-time",
             "nullable": true
           },
           "dateOfBirthSignificantOther": {
             "type": "string",
+            "description": "* Geburtsdatum des Partners\r\n* Date of birth from the significant other",
             "format": "date-time",
             "nullable": true
           },
           "isBusiness": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "* Kennzeichen das angibt ob es sich um einen gewerblichen Kunden handelt\r\n* Flag that defines the customer as buisness"
           },
           "iban": {
             "type": "string",
+            "description": "* IBAN\r\n* IBAN",
             "nullable": true
           },
           "info1": {
             "type": "string",
+            "description": "* Informationen über den Kunden\r\n* Information about the customer",
             "nullable": true
           },
           "info2": {
             "type": "string",
+            "description": "* Mehr Informationen über den Kunden\r\n* More information about the customer",
             "nullable": true
           },
           "bankAccount": {
             "type": "string",
+            "description": "* Konto-Nummer\r\n* Bank account number",
             "nullable": true
           },
           "gender": {
             "$ref": "#/components/schemas/Gender"
           },
           "isStaff": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "* Kennzeichen das angibt ob es sich bei dem Kunden gleichzeitig um einen Mitarbeiter handelt\r\n* Flag that defines the customer as staff"
           },
           "mobilePhone": {
             "type": "string",
+            "description": "* Primäre Handynmummer\r\n* Primary mobile phone number",
             "nullable": true
           },
           "subscriptionNewsletter": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "* Kennzeichen das angibt ob der Kunde einen Newsletter empfangen möchte\r\n* Flag that defines that the customer wants to receive a newsletter"
           },
           "subscriptionNewsletterConfirmationDate": {
             "type": "string",
+            "description": "* Datum das angibt, wann der Kunde dem Empfang eines Newsletters zugestimmt hat\r\n* Flag that defines when the customer consented to receive a newsletter",
             "format": "date-time",
             "nullable": true
           },
           "lastName": {
             "type": "string",
+            "description": "* Nachname\r\n* Last name",
             "nullable": true
           },
           "city": {
             "type": "string",
-            "nullable": true
+            "description": "Stadt\r\n\r\nCity",
+            "nullable": true,
+            "example": "Bielefeld"
           },
           "zipCode": {
             "type": "string",
+            "description": "* Postleitzahl\r\n* ZIP code",
             "nullable": true
           },
           "isLocked": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "* Kennzeichen das angibt ob der Kunde gesperrt ist\r\n* Flag that defines the customer as locked"
           },
           "street": {
             "type": "string",
+            "description": "* Straße\r\n* Street",
             "nullable": true
           },
           "bic": {
             "type": "string",
+            "description": "* BIC\r\n* BIC",
             "nullable": true
           },
           "telephone": {
             "type": "string",
+            "description": "* Primäre Telefonnummer\r\n* Primary telephone number",
             "nullable": true
           },
           "firstName": {
             "type": "string",
+            "description": "* Vorname\r\n* First name",
             "nullable": true
           },
           "subscriptionAdvertising": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "* Kennzeichen das angibt ob der Kunde Werbung erhalten möchte\r\n* Flag that defines that the customer wants to receive advertising"
           },
           "countryNumber": {
             "type": "string",
+            "description": "* Land-Nummer\r\n* Country number",
             "nullable": true
           },
           "staffNumber": {
             "type": "integer",
+            "description": "* Personal-Nummer\r\n* Staff number",
             "format": "int32",
             "nullable": true
           },
           "selectionCriteria1": {
             "type": "string",
+            "description": "* Selektionsmerkmal 1\r\n* Selection criteria 1",
             "nullable": true
           },
           "selectionCriteria2": {
             "type": "string",
+            "description": "* Selektionsmerkmal 2\r\n* Selection criteria 2",
             "nullable": true
           },
           "selectionCriteria3": {
             "type": "string",
+            "description": "* Selektionsmerkmal 3\r\n* Selection criteria 3",
             "nullable": true
           },
           "selectionCriteria4": {
             "type": "string",
+            "description": "* Selektionsmerkmal 4\r\n* Selection criteria 4",
             "nullable": true
           },
           "selectionCriteria5": {
             "type": "string",
+            "description": "* Selektionsmerkmal 5\r\n* Selection criteria 5",
             "nullable": true
           },
           "selectionCriteria6": {
             "type": "string",
+            "description": "* Selektionsmerkmal 6\r\n* Selection criteria 6",
             "nullable": true
           },
           "selectionCriteria7": {
             "type": "string",
+            "description": "* Selektionsmerkmal 7\r\n* Selection criteria 7",
             "nullable": true
           },
           "selectionCriteria8": {
             "type": "string",
+            "description": "* Selektionsmerkmal 8\r\n* Selection criteria 8",
             "nullable": true
           },
           "selectionCriteria9": {
             "type": "string",
+            "description": "* Selektionsmerkmal 9\r\n* Selection criteria 9",
             "nullable": true
           },
           "vatNumber": {
             "type": "string",
+            "description": "* Steuer-Nummer\r\n* VAT number",
             "nullable": true
           },
           "declarationsOfConsent": {
@@ -550,54 +653,67 @@
           },
           "groupNumber": {
             "type": "integer",
+            "description": "* Verweis auf die zugewiesene Kundengruppe\r\n* Reference to the assigned customer group",
             "format": "int32"
           },
           "customerCard": {
             "type": "boolean",
+            "description": "* Kdkarte\r\n* customerCard",
             "nullable": true
           },
           "webshopUser": {
             "type": "string",
+            "description": "* Webshop Benutzer\r\n* Webshop user",
             "nullable": true
           },
           "webshopUserPassword": {
             "type": "string",
+            "description": "* Webshop Benutzer Passwort\r\n* Webshop user password",
             "nullable": true
           },
           "customerType": {
             "type": "string",
+            "description": "* Kundentyp\r\n* Customer type",
             "nullable": true
           },
           "poBox": {
             "type": "string",
+            "description": "* Postfach\r\n* PO-Box",
             "nullable": true
           },
           "poBoxZipCode": {
             "type": "string",
+            "description": "* Postfach PLZ\r\n* PO-Box Zip code",
             "nullable": true
           },
           "telephoneSecondary": {
             "type": "string",
+            "description": "* Sekundäre Telefonnummer\r\n* Secondary telephone number",
             "nullable": true
           },
           "mobilePhoneSecondary": {
             "type": "string",
+            "description": "* Sekundäre Handynmummer\r\n* Secondary mobile phone number",
             "nullable": true
           },
           "discountGroup": {
             "type": "integer",
+            "description": "* Rabattgruppe\r\n* Discount group",
             "format": "int32"
           },
           "discountPercent": {
             "type": "number",
+            "description": "* Rabatt %\r\n* Discount %",
             "format": "double"
           },
           "bonusPercent": {
             "type": "number",
+            "description": "* Bonus %\r\n* Bonus %",
             "format": "double"
           },
           "familyNumber": {
             "type": "integer",
+            "description": "* Familien-Nummer\r\n* Family number",
             "format": "int32",
             "nullable": true
           },
@@ -606,75 +722,92 @@
           },
           "number": {
             "type": "integer",
+            "description": "* Kunde-Nummer\r\n* Customer number",
             "format": "int32",
             "nullable": true
           },
           "creationDate": {
             "type": "string",
+            "description": "* Datum der Anlage des Kunden\r\n* Date the customer was created",
             "format": "date-time",
             "nullable": true
           },
           "searchTerm": {
             "type": "string",
+            "description": "* Suchwort des Kunden\r\n* Searchterm of the customer",
             "nullable": true
           },
           "personalSalutation": {
             "type": "string",
+            "description": "* Persönliche Anrede\r\n* Personal salutation",
             "nullable": true
           },
           "name1": {
             "type": "string",
+            "description": "* Name 1\r\n* Name 1",
             "nullable": true
           },
           "name2": {
             "type": "string",
+            "description": "* Name 2\r\n* Name 2",
             "nullable": true
           },
           "name3": {
             "type": "string",
+            "description": "* Name 3\r\n* Name 3",
             "nullable": true
           },
           "salutation": {
             "type": "string",
+            "description": "* Anrede\r\n* Salutation",
             "nullable": true
           },
           "revenue": {
             "type": "number",
+            "description": "* Umsatz des Kunden\r\n* Revenue of the customer",
             "format": "double",
             "nullable": true
           },
           "bonusValue": {
             "type": "number",
+            "description": "* Bonuswert des Kunden\r\n* Bonus value of the customer",
             "format": "double",
             "nullable": true
           },
           "loyalityPoints": {
             "type": "integer",
+            "description": "* Bonuspunkte\r\n* Loyality points",
             "format": "int32"
           },
           "lastChange": {
             "type": "string",
+            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
             "format": "date-time",
             "nullable": true
           },
           "hasCustomerCard": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "* Kennzeichen, ob Kundenkarte vorhanden ist\r\n* Flag that defines whether the customer has a customer card"
           },
           "customerCardPrintDate": {
             "type": "string",
+            "description": "* Datum des Kundekartendrucks\r\n* Date of the customer card printout",
             "format": "date-time",
             "nullable": true
           },
           "inactiveFlag": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "* Kennzeichen, dass den Inaktivitätsstatus des Kunden wiedergibt (1 = falsche Adresse, 2 = ohne Umsatz)\r\n* Flag that defines whether the customer is in an inactivity state (1 = wrong address, 2 = without sales)"
           },
           "lastBonusSettlementDate": {
             "type": "string",
+            "description": "* Datum der letzten Bonusabrechnung\r\n* Date of the last bonus settlement",
             "format": "date-time",
             "nullable": true
           },
           "id": {
             "type": "string",
+            "description": "* Eindeutige ID\r\n* Unique identifier",
             "format": "uuid"
           }
         },
