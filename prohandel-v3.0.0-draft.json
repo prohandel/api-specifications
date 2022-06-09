@@ -101,7 +101,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [
+              "read:kd"
+            ]
+          }
+        ]
       }
     },
     "/api/v3/customer/{id}": {
@@ -187,7 +194,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [
+              "read:kd"
+            ]
+          }
+        ]
       }
     },
     "/api/v3/customer/number/{number}": {
@@ -271,7 +285,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [
+              "read:kd"
+            ]
+          }
+        ]
       }
     },
     "/api/v3/customer/changed/{from}/{to}": {
@@ -368,7 +389,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [
+              "read:kd"
+            ]
+          }
+        ]
       }
     },
     "/api/v3/customer": {
@@ -445,7 +473,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [
+              "read:kd"
+            ]
+          }
+        ]
       }
     }
   },
@@ -998,6 +1033,14 @@
           }
         },
         "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Please insert JWT with Bearer into field",
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
       }
     }
   }
