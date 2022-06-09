@@ -30,7 +30,10 @@
             "description": "The email address to filter customers by.",
             "required": true,
             "schema": {
-              "type": "string"
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string",
+              "description": "The email address to filter customers by."
             }
           },
           {
@@ -39,7 +42,9 @@
             "description": "Set the continuation token to from the previous request result to return the next page of results.",
             "schema": {
               "type": "string",
-              "format": "continuationToken"
+              "description": "Set the continuation token to from the previous request result to return the next page of results.",
+              "format": "continuationToken",
+              "nullable": true
             }
           },
           {
@@ -47,7 +52,10 @@
             "in": "query",
             "description": "Configures the amount of records returned per page (Default if ommitted: 10).",
             "schema": {
+              "maximum": 1000,
+              "minimum": 1,
               "type": "integer",
+              "description": "Configures the amount of records returned per page (Default if ommitted: 10).",
               "format": "int32"
             }
           }
@@ -301,7 +309,9 @@
             "description": "Set the continuation token to from the previous request result to return the next page of results.",
             "schema": {
               "type": "string",
-              "format": "continuationToken"
+              "description": "Set the continuation token to from the previous request result to return the next page of results.",
+              "format": "continuationToken",
+              "nullable": true
             }
           },
           {
@@ -309,7 +319,10 @@
             "in": "query",
             "description": "Configures the amount of records returned per page (Default if ommitted: 10).",
             "schema": {
+              "maximum": 1000,
+              "minimum": 1,
               "type": "integer",
+              "description": "Configures the amount of records returned per page (Default if ommitted: 10).",
               "format": "int32"
             }
           }
@@ -373,7 +386,9 @@
             "description": "Set the continuation token to from the previous request result to return the next page of results.",
             "schema": {
               "type": "string",
-              "format": "continuationToken"
+              "description": "Set the continuation token to from the previous request result to return the next page of results.",
+              "format": "continuationToken",
+              "nullable": true
             }
           },
           {
@@ -381,7 +396,10 @@
             "in": "query",
             "description": "Configures the amount of records returned per page (Default if ommitted: 10).",
             "schema": {
+              "maximum": 1000,
+              "minimum": 1,
               "type": "integer",
+              "description": "Configures the amount of records returned per page (Default if ommitted: 10).",
               "format": "int32"
             }
           }
@@ -947,6 +965,39 @@
           }
         },
         "additionalProperties": { }
+      },
+      "RequestModel": {
+        "required": [
+          "email",
+          "from",
+          "id",
+          "number",
+          "to"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string",
+            "description": "The email address to filter customers by.",
+            "format": "email"
+          },
+          "continuationToken": {
+            "type": "string",
+            "description": "Set the continuation token to from the previous request result to return the next page of results.",
+            "format": "continuationToken",
+            "nullable": true
+          },
+          "resultsPerPage": {
+            "maximum": 1000,
+            "minimum": 1,
+            "type": "integer",
+            "description": "Configures the amount of records returned per page (Default if ommitted: 10).",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
       }
     }
   }
