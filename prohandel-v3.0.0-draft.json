@@ -127,10 +127,8 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "uuid",
-              "example": "12345678-c77f-45bc-b31c-45eadc182343"
-            },
-            "example": "12345678-c77f-45bc-b31c-45eadc182343"
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -504,12 +502,14 @@
             "type": "integer",
             "description": "* Filiale-Nummer\r\n* Branch number",
             "format": "int32",
-            "nullable": true
+            "nullable": true,
+            "example": 1
           },
           "title": {
             "type": "string",
             "description": "* Titel des Kunden\r\n* Titel of the customer",
-            "nullable": true
+            "nullable": true,
+            "example": "Dr."
           },
           "isLockedForSelections": {
             "type": "boolean",
@@ -519,7 +519,8 @@
             "type": "integer",
             "description": "* Bankleitzahl\r\n* Bankcode",
             "format": "int32",
-            "nullable": true
+            "nullable": true,
+            "example": 50070010
           },
           "signedDeclarationOfConsent": {
             "type": "boolean",
@@ -528,7 +529,8 @@
           "email": {
             "type": "string",
             "description": "* E-Mail Adresse\r\n* E-Mail address",
-            "nullable": true
+            "nullable": true,
+            "example": "m.mustermann@musterstadt.de"
           },
           "maritalStatus": {
             "$ref": "#/components/schemas/MaritalStatus"
@@ -536,19 +538,22 @@
           "fax": {
             "type": "string",
             "description": "* Fax-Nummer\r\n* Fax number",
-            "nullable": true
+            "nullable": true,
+            "example": "+49 123 456789"
           },
           "dateOfBirth": {
             "type": "string",
             "description": "* Geburtsdatum\r\n* Date of birth",
-            "format": "date-time",
-            "nullable": true
+            "format": "date",
+            "nullable": true,
+            "example": "1975-01-01"
           },
           "dateOfBirthSignificantOther": {
             "type": "string",
             "description": "* Geburtsdatum des Partners\r\n* Date of birth from the significant other",
-            "format": "date-time",
-            "nullable": true
+            "format": "date",
+            "nullable": true,
+            "example": "1983-12-31"
           },
           "isBusiness": {
             "type": "boolean",
@@ -557,12 +562,14 @@
           "iban": {
             "type": "string",
             "description": "* IBAN\r\n* IBAN",
-            "nullable": true
+            "nullable": true,
+            "example": "DE94 5007 0010 0123 4567 89"
           },
           "info1": {
             "type": "string",
             "description": "* Informationen über den Kunden\r\n* Information about the customer",
-            "nullable": true
+            "nullable": true,
+            "example": "Ignoriert Mahnungen"
           },
           "info2": {
             "type": "string",
@@ -572,7 +579,8 @@
           "bankAccount": {
             "type": "string",
             "description": "* Konto-Nummer\r\n* Bank account number",
-            "nullable": true
+            "nullable": true,
+            "example": "123456789"
           },
           "gender": {
             "$ref": "#/components/schemas/Gender"
@@ -584,7 +592,8 @@
           "mobilePhone": {
             "type": "string",
             "description": "* Primäre Handynmummer\r\n* Primary mobile phone number",
-            "nullable": true
+            "nullable": true,
+            "example": "+49 1010 123456789"
           },
           "subscriptionNewsletter": {
             "type": "boolean",
@@ -593,24 +602,26 @@
           "subscriptionNewsletterConfirmationDate": {
             "type": "string",
             "description": "* Datum das angibt, wann der Kunde dem Empfang eines Newsletters zugestimmt hat\r\n* Flag that defines when the customer consented to receive a newsletter",
-            "format": "date-time",
+            "format": "date",
             "nullable": true
           },
           "lastName": {
             "type": "string",
             "description": "* Nachname\r\n* Last name",
-            "nullable": true
+            "nullable": true,
+            "example": "Mustermann"
           },
           "city": {
             "type": "string",
-            "description": "Stadt\r\n\r\nCity",
+            "description": "* Stadt\r\n* City",
             "nullable": true,
             "example": "Bielefeld"
           },
           "zipCode": {
             "type": "string",
             "description": "* Postleitzahl\r\n* ZIP code",
-            "nullable": true
+            "nullable": true,
+            "example": "33609"
           },
           "isLocked": {
             "type": "boolean",
@@ -619,31 +630,36 @@
           "street": {
             "type": "string",
             "description": "* Straße\r\n* Street",
-            "nullable": true
+            "nullable": true,
+            "example": "Am Lenkwerk 7"
           },
           "bic": {
             "type": "string",
             "description": "* BIC\r\n* BIC",
-            "nullable": true
+            "nullable": true,
+            "example": "DEUTDEFFXXX"
           },
           "telephone": {
             "type": "string",
             "description": "* Primäre Telefonnummer\r\n* Primary telephone number",
-            "nullable": true
+            "nullable": true,
+            "example": "+49 2020 123456789"
           },
           "firstName": {
             "type": "string",
             "description": "* Vorname\r\n* First name",
-            "nullable": true
+            "nullable": true,
+            "example": "Max"
           },
           "subscriptionAdvertising": {
             "type": "boolean",
             "description": "* Kennzeichen das angibt ob der Kunde Werbung erhalten möchte\r\n* Flag that defines that the customer wants to receive advertising"
           },
-          "countryNumber": {
+          "countryName": {
             "type": "string",
             "description": "* Land-Nummer\r\n* Country number",
-            "nullable": true
+            "nullable": true,
+            "example": "DE"
           },
           "staffNumber": {
             "type": "integer",
@@ -654,37 +670,44 @@
           "selectionCriteria1": {
             "type": "string",
             "description": "* Selektionsmerkmal 1\r\n* Selection criteria 1",
-            "nullable": true
+            "nullable": true,
+            "example": "KundenApp"
           },
           "selectionCriteria2": {
             "type": "string",
             "description": "* Selektionsmerkmal 2\r\n* Selection criteria 2",
-            "nullable": true
+            "nullable": true,
+            "example": ""
           },
           "selectionCriteria3": {
             "type": "string",
             "description": "* Selektionsmerkmal 3\r\n* Selection criteria 3",
-            "nullable": true
+            "nullable": true,
+            "example": "13"
           },
           "selectionCriteria4": {
             "type": "string",
             "description": "* Selektionsmerkmal 4\r\n* Selection criteria 4",
-            "nullable": true
+            "nullable": true,
+            "example": ""
           },
           "selectionCriteria5": {
             "type": "string",
             "description": "* Selektionsmerkmal 5\r\n* Selection criteria 5",
-            "nullable": true
+            "nullable": true,
+            "example": ""
           },
           "selectionCriteria6": {
             "type": "string",
             "description": "* Selektionsmerkmal 6\r\n* Selection criteria 6",
-            "nullable": true
+            "nullable": true,
+            "example": ""
           },
           "selectionCriteria7": {
             "type": "string",
             "description": "* Selektionsmerkmal 7\r\n* Selection criteria 7",
-            "nullable": true
+            "nullable": true,
+            "example": ""
           },
           "selectionCriteria8": {
             "type": "string",
@@ -694,12 +717,14 @@
           "selectionCriteria9": {
             "type": "string",
             "description": "* Selektionsmerkmal 9\r\n* Selection criteria 9",
-            "nullable": true
+            "nullable": true,
+            "example": ""
           },
           "vatNumber": {
             "type": "string",
             "description": "* Steuer-Nummer\r\n* VAT number",
-            "nullable": true
+            "nullable": true,
+            "example": ""
           },
           "declarationsOfConsent": {
             "$ref": "#/components/schemas/DeclarationOfConsent"
@@ -717,27 +742,32 @@
           "webshopUser": {
             "type": "string",
             "description": "* Webshop Benutzer\r\n* Webshop user",
-            "nullable": true
+            "nullable": true,
+            "example": ""
           },
           "webshopUserPassword": {
             "type": "string",
             "description": "* Webshop Benutzer Passwort\r\n* Webshop user password",
-            "nullable": true
+            "nullable": true,
+            "example": ""
           },
           "customerType": {
             "type": "string",
             "description": "* Kundentyp\r\n* Customer type",
-            "nullable": true
+            "nullable": true,
+            "example": ""
           },
           "poBox": {
             "type": "string",
             "description": "* Postfach\r\n* PO-Box",
-            "nullable": true
+            "nullable": true,
+            "example": ""
           },
           "poBoxZipCode": {
             "type": "string",
             "description": "* Postfach PLZ\r\n* PO-Box Zip code",
-            "nullable": true
+            "nullable": true,
+            "example": ""
           },
           "telephoneSecondary": {
             "type": "string",
@@ -747,7 +777,8 @@
           "mobilePhoneSecondary": {
             "type": "string",
             "description": "* Sekundäre Handynmummer\r\n* Secondary mobile phone number",
-            "nullable": true
+            "nullable": true,
+            "example": ""
           },
           "discountGroup": {
             "type": "integer",
@@ -762,7 +793,8 @@
           "bonusPercent": {
             "type": "number",
             "description": "* Bonus %\r\n* Bonus %",
-            "format": "double"
+            "format": "double",
+            "example": 10
           },
           "familyNumber": {
             "type": "integer",
@@ -777,60 +809,70 @@
             "type": "integer",
             "description": "* Kunde-Nummer\r\n* Customer number",
             "format": "int32",
-            "nullable": true
+            "nullable": true,
+            "example": 12
           },
           "creationDate": {
             "type": "string",
             "description": "* Datum der Anlage des Kunden\r\n* Date the customer was created",
-            "format": "date-time",
+            "format": "date",
             "nullable": true
           },
           "searchTerm": {
             "type": "string",
             "description": "* Suchwort des Kunden\r\n* Searchterm of the customer",
-            "nullable": true
+            "nullable": true,
+            "example": "MustermannMax"
           },
           "personalSalutation": {
             "type": "string",
             "description": "* Persönliche Anrede\r\n* Personal salutation",
-            "nullable": true
+            "nullable": true,
+            "example": "Sehr geehrte Damen und Herren"
           },
           "name1": {
             "type": "string",
             "description": "* Name 1\r\n* Name 1",
-            "nullable": true
+            "nullable": true,
+            "example": ""
           },
           "name2": {
             "type": "string",
             "description": "* Name 2\r\n* Name 2",
-            "nullable": true
+            "nullable": true,
+            "example": ""
           },
           "name3": {
             "type": "string",
             "description": "* Name 3\r\n* Name 3",
-            "nullable": true
+            "nullable": true,
+            "example": ""
           },
           "salutation": {
             "type": "string",
             "description": "* Anrede\r\n* Salutation",
-            "nullable": true
+            "nullable": true,
+            "example": "Herr"
           },
           "revenue": {
             "type": "number",
             "description": "* Umsatz des Kunden\r\n* Revenue of the customer",
             "format": "double",
-            "nullable": true
+            "nullable": true,
+            "example": 160.95
           },
           "bonusValue": {
             "type": "number",
             "description": "* Bonuswert des Kunden\r\n* Bonus value of the customer",
             "format": "double",
-            "nullable": true
+            "nullable": true,
+            "example": 12.53
           },
           "loyalityPoints": {
             "type": "integer",
             "description": "* Bonuspunkte\r\n* Loyality points",
-            "format": "int32"
+            "format": "int32",
+            "example": 13
           },
           "lastChange": {
             "type": "string",
@@ -845,7 +887,7 @@
           "customerCardPrintDate": {
             "type": "string",
             "description": "* Datum des Kundekartendrucks\r\n* Date of the customer card printout",
-            "format": "date-time",
+            "format": "date",
             "nullable": true
           },
           "inactiveFlag": {
@@ -855,7 +897,7 @@
           "lastBonusSettlementDate": {
             "type": "string",
             "description": "* Datum der letzten Bonusabrechnung\r\n* Date of the last bonus settlement",
-            "format": "date-time",
+            "format": "date",
             "nullable": true
           },
           "id": {
@@ -1038,7 +1080,7 @@
     "securitySchemes": {
       "Bearer": {
         "type": "http",
-        "description": "Please insert JWT with Bearer into field",
+        "description": "Please use JWT with Bearer",
         "scheme": "Bearer",
         "bearerFormat": "JWT"
       }
