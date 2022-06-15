@@ -202,7 +202,7 @@
         ]
       }
     },
-    "/api/v3/customer/number/{number}": {
+    "/api/v3/customer/{number}": {
       "get": {
         "tags": [
           "Customer"
@@ -574,7 +574,8 @@
           "info2": {
             "type": "string",
             "description": "* Mehr Informationen über den Kunden\r\n* More information about the customer",
-            "nullable": true
+            "nullable": true,
+            "example": ""
           },
           "bankAccount": {
             "type": "string",
@@ -712,7 +713,8 @@
           "selectionCriteria8": {
             "type": "string",
             "description": "* Selektionsmerkmal 8\r\n* Selection criteria 8",
-            "nullable": true
+            "nullable": true,
+            "example": ""
           },
           "selectionCriteria9": {
             "type": "string",
@@ -772,7 +774,8 @@
           "telephoneSecondary": {
             "type": "string",
             "description": "* Sekundäre Telefonnummer\r\n* Secondary telephone number",
-            "nullable": true
+            "nullable": true,
+            "example": ""
           },
           "mobilePhoneSecondary": {
             "type": "string",
