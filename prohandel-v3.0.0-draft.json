@@ -2,16 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "prohandel API",
-    "description": "Test",
-    "termsOfService": "https://prohandel.de/terms",
-    "contact": {
-      "name": "Example Contact",
-      "url": "https://prohandel.de/contact"
-    },
-    "license": {
-      "name": "Example License",
-      "url": "https://prohandel.de/license"
-    },
+    "description": "# Versioning\r\n\r\nThe prohandel API adheres to Semantic Versioning guidelines.\r\n\r\nEach version number consists of three parts: `MAJOR`, `MINOR`, and `PATCH`. These components serve the following purposes:\r\n\r\n- `MAJOR` version indicates significant changes to the API that are not backwards compatible.\r\n- `MINOR` version denotes the addition of new features while maintaining backwards compatibility. This includes the addition of fields to existing models.\r\n- `PATCH` version signifies bug fixes that preserve backwards compatibility.\r\n\r\nThe `MAJOR` version is reflected in the API's base URL */api/v3*.\r\n\r\n# Paging\r\n\r\nEndpoints that return multiple entities use a paging mechanism in almost all cases. Per default only 10 entities are returned in the response. The number of returned entities can be modified by setting the `ResultsPerPage` parameter in the request. This value is capped for most endpoints between `1` and `100` results per page.\r\n\r\n```http\r\nGET https://prohandel.cloud/api/v3/article?resultsPerPage=25\r\n```\r\n\r\nIf there are more results on following pages a request always returns a continuation token. This token can be passed - as is - to the parameter `ContinuationToken` to request the next page. If `ContinuationToken` is returning as `null`, no more pages exist.\r\n\r\nIn contrast to api version 2 this version uses an efficient keyset pagination in the background.\r\n\r\n# Correlation ID\r\n\r\nA correlation ID is a unique identifier assigned to a specific request or transaction as it moves through different components of a distributed system. It helps in tracking and correlating related events or logs across these components.\r\n\r\n1. **Generate a Correlation ID (optional)**: When you initiate a request to the API, generate a unique correlation ID. This can be a UUID (Universally Unique Identifier) or any other unique identifier format suitable for your system.\r\n    \r\n2. **Include Correlation ID in Requests**: Add the generated correlation ID to the X-Correlation-ID header of the API request. This header will travel along with the request as it moves through different services. In case no correlation ID is provided the API will generate one.\r\n    \r\n3. **Logging and Tracing**: Make sure to log the correlation ID along with other relevant information such as timestamps, request parameters, and any errors encountered.\r\n    \r\n4. **Debugging and Troubleshooting**: When you are investigating issues or tracing a request make sure to **always include the correlation ID in support tickets**. This helps in quickly identifying the path taken by the request through different services and pinpointing any issues encountered along the way.\r\n\r\n# Common usage examples\r\n\r\nOver the past years we have identified three main scenarios how customers use our api. There is a high probability you can adopt one of these workflows when developing a new app.\r\n\r\n## On-demand requests\r\n\r\nFor applications that only use a small subset of the available data it may be enough to query the prohandel api without any persistence layer for the returned data.\r\n\r\nFor example an application that allows customers to see the opening times and contact data of different branches could query the branch endpoint and display the information.\r\n\r\n**It is very important to acknowledge that API credentials must always be maintained securely within an environment under your control (server-side) and must never be integrated into any client-side executed code.**\r\n\r\nAchieving this objective may involve deploying a proxy to authenticate and forward client requests to the Prohandel API.\r\n\r\n## Data mirroring\r\n\r\nData mirroring entails the process of retrieving data from the API either periodically or in near real-time and storing it within a local database. This methodology proves advantageous when greater control over the data is needed.\r\n\r\n### Periodical updates\r\n\r\nThe API offers the functionality to generate periodic full exports of a particular entity. This strategy is advantageous when finer control over the data is required, albeit the necessity for near real-time updates is not critical. A full export can be initiated daily and subsequently be retrieved in CSV format. For detailed instructions on how to implement this feature, please refer to the section *Exports*.\r\n\r\n### Continuous updates\r\n\r\nTo ensure near real-time information, such as stock values in a web shop, the API offers a feature to deliver changed data for a specific endpoint. That means that in the background changes are tracked and then incrementally shipped to you when querying the api. For this to work the entity has to have the `change/<from>/<to>` endpoint.\r\n\r\nHere's the workflow:\r\n\r\n1. Trigger an export and use the returned data to initialize the local database. Keep the continueWithChangeId from the export metadata.\r\n\r\n```http\r\nPOST https://prohandel.cloud/api/v3/article/export\r\nRETURNS id: 8f959fb9-b416-4758-8573-3c91ee63259b, continueWithChangeId: 420\r\n...\r\nGET /api/v3/article/export/8f959fb9-b416-4758-8573-3c91ee63259b/download\r\n```\r\n\r\n2. Retrieve the current changeid from the system and persist the value.\r\n   \r\n```http\r\nGET https://prohandel.cloud/api/v3/changeid/current\r\nRETURNS currentChangeId: 1337\r\n```\r\n\r\n3. Utilize `continueWithChangeId` as the `from` parameter and the change ID from *step 2* as the `to` parameter to acquire incremental data updates.\r\n   \r\n```http\r\nGET https://prohandel.cloud/api/v3/article/changed/420/1337\r\n```\r\n\r\n4. Conduct a merge operation in the local database, incorporating newly created or updated data while removing deleted rows.\r\n5. Wait a few minutes.\r\n6. Fetch the current changeid from the system.\r\n   \r\n```http\r\nGET https://prohandel.cloud/api/v3/changeid/current\r\nRETURNS currentChangeId: 2183\r\n```\r\n\r\n7. Employ the persisted change ID from the previous run (*step 2*) as the `from` parameter and the change ID from *step 6* as the `to` parameter for further incremental data retrieval.\r\n   \r\n```http\r\nGET https://prohandel.cloud/api/v3/article/changed/1337/2183\r\n```\r\n\r\n8. Perform another merge operation in the local database, handling new additions or updates, and purging deleted rows.\r\n9. Wait a few minutes before continuing the loop from *step 6*.\r\n\r\nBy adhering to this workflow, you can maintain an updated and synchronized local database with the latest data from the API, ensuring the timely availability of information for your web shop or other applications.\r\n\r\n### Hybrid approach\r\n\r\nThe integration of these strategies can be tailored to specific requirements, allowing for a nuanced approach that accounts for varying data update frequencies across different entities. This flexibility enables the optimization of data synchronization processes to ensure efficient and timely updates.\r\n\r\n# Entities\r\n\r\nThis API adheres to predefined structural guidelines governing the organization and composition of entities.\r\n\r\n## Entity keys\r\n\r\nThe methods for uniquely identifying an entity within the system.\r\n\r\n### Numeric\r\n\r\nThe majority of entities within the system are equipped with a numeric identifier, consistently accessible via the `number` field. However, certain scenarios may demand a compound identification mechanism, where the numeric identifier must be combined with another field value to establish uniqueness. In such instances, the entity may either lack a 'Get by number' endpoint or necessitate additional parameters for retrieval.\r\n\r\n### Globally unique ID (GUID)\r\n\r\nThe Global Unique Identifier (GUID) serves as the exclusive identifier for an entity, alone ensuring its unique identification within the system. This identifier is consistently accessible through the `id` field.\r\n\r\n### References\r\n\r\nReferences to other entities are identified by their respective field names, structured as follows: for GUID references, the format is *entity name + id* (e.g., articleSizeId, customerId), while for numeric identifier references, it is *entity name + number* (e.g., articleNumber, customerNumber).\r\n\r\n## Instructions\r\n\r\nInstructions represent a distinct entity type within the system, requiring explicit booking by the system to enact their effects. For instance, upon creation of a transfer instruction, the actual transfer of the article does not occur instantly; instead, it awaits processing in the system's booking queue until the next operational cycle. Once the cycle completes, the article's stock diminishes in the source branch while increasing in the target branch.\r\n\r\nInstructions can encounter failures during booking. These booking errors necessitate resolution within the primary ERP (prohandel Warenwirtschaft).\r\n\r\n## Exports\r\n\r\nExports serve as a powerful feature designed for the efficient extraction of substantial datasets. \r\n\r\nTriggering an export is facilitated through the 'Create export' endpoint of an entity. It is important to note that exports can only be initiated once per day, with a minimum interval of 23 hours between triggers. Upon triggering an export, the system schedules the creation of the export file, typically completing within 15 minutes. However, factors such as system load or user-defined export disablement during specific periods may cause delays of several hours. \r\n\r\nTo monitor the progress of an export, developers can periodically check its status using the 'Get export by id' endpoint. In cases where multiple exports are triggered simultaneously, monitoring the status of the most recently triggered export may suffice. Once the status transitions to `ready`, indicating completion, the export becomes available for download. \r\n\r\nThe download endpoint returns a 303 redirection. Please ensure that client applications either automatically follow redirects or manually retrieve the referenced file from the location header.\r\n\r\nThe exported file is gzip compressed and requires decompression before accessing the contained CSV data.\r\n\r\n# Status codes\r\n\r\nThe API employs distinct status codes to communicate the success or failure of a request, as well as to provide guidance on the expected contents of the response body.\r\n\r\n- `200`: The request was successful, and the entity data is provided in the response body.\r\n- `201`: The request was successful, and no entity data is returned. However, the URL to retrieve the created entity is available in the location header.\r\n- `204`: The request was successful, but no data is returned.\r\n- `303`: The request results in a redirection to another URL specified in the location header, typically used for export data download.\r\n- `400`: Format errors or issues with submitted data, such as referencing a nonexistent or ineligible entity. Resolution lies with the client, requiring a retry with modified data.\r\n- `401`: Authentication failure. See authentication section.\r\n- `403`: Authenticated but no permission to access entity. See authentication section.\r\n- `404`: The requested entity could not be found.\r\n- `405`: The HTTP method used in the request is not allowed. Ensure the correct HTTP method (GET, POST, PUT, DELETE) is utilized.\r\n- `409`: An update conflict occurred, indicating that the entity may have been concurrently updated from another source. Refetch the entity and attempt to apply changes again.\r\n- `429`: Too many requests. Certain endpoints may enforce rate-limiting measures, restricting the frequency of requests. If wait instructions are provided in the headers, follow them; otherwise, significantly reduce the request rate.\r\n- `500`: The server encountered an error. If this issue persists, please initiate a support ticket for further assistance.\r\n- `502`: A service relied upon by the API failed to function as expected. Retry the request at a later time.\r\n- `503`: The service is currently unavailable. Please attempt the request again later.",
     "version": "v3"
   },
   "paths": {
@@ -1562,7 +1553,7 @@
         ]
       }
     },
-    "/api/v3/articleSize/branchNumber/{branchNumber}/number/{articleSizeNumber}": {
+    "/api/v3/articleSize/branchNumber/{branchNumber}/number/{number}": {
       "get": {
         "tags": [
           "ArticleSize"
@@ -1584,21 +1575,13 @@
           },
           {
             "name": "number",
-            "in": "query",
+            "in": "path",
             "description": "The number of the article size to return.",
             "required": true,
             "schema": {
               "type": "number",
               "description": "The number of the article size to return.",
               "format": "double"
-            }
-          },
-          {
-            "name": "articleSizeNumber",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -5399,32 +5382,24 @@
         ]
       }
     },
-    "/api/v3/country/{number}": {
+    "/api/v3/country/key/{key}": {
       "get": {
         "tags": [
           "Country"
         ],
-        "summary": "Get country by number",
+        "summary": "Get country by key",
         "description": "Retrieves the country by its primary key. The primary key of a country is its key field.",
         "operationId": "ea899178-9fe3-4edf-af4c-17b9516b9338",
         "parameters": [
           {
             "name": "key",
-            "in": "query",
+            "in": "path",
             "description": "The key of the country. Can be found as key field in a country object or as CountryKey if referenced from another entity.",
             "required": true,
             "schema": {
               "minLength": 1,
               "type": "string",
               "description": "The key of the country. Can be found as key field in a country object or as CountryKey if referenced from another entity."
-            }
-          },
-          {
-            "name": "number",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -5994,8 +5969,9 @@
             "name": "status",
             "in": "path",
             "description": "The status of the coupon.",
-            "required": true,
             "schema": {
+              "maximum": 1,
+              "minimum": 0,
               "type": "integer",
               "description": "The status of the coupon.",
               "format": "int32"
@@ -6200,7 +6176,7 @@
         ]
       }
     },
-    "/api/v3/coupon/{internetCode}": {
+    "/api/v3/coupon/code/{internetCode}": {
       "get": {
         "tags": [
           "Coupon"
@@ -6420,8 +6396,9 @@
             "name": "status",
             "in": "path",
             "description": "The status of the coupon.",
-            "required": true,
             "schema": {
+              "maximum": 1,
+              "minimum": 0,
               "type": "integer",
               "description": "The status of the coupon.",
               "format": "int32"
@@ -7017,8 +6994,9 @@
             "name": "status",
             "in": "path",
             "description": "The status of the credit.",
-            "required": true,
             "schema": {
+              "maximum": 1,
+              "minimum": 0,
               "type": "integer",
               "description": "The status of the credit.",
               "format": "int32"
@@ -7351,8 +7329,9 @@
             "name": "status",
             "in": "path",
             "description": "The status of the credit.",
-            "required": true,
             "schema": {
+              "maximum": 1,
+              "minimum": 0,
               "type": "integer",
               "description": "The status of the credit.",
               "format": "int32"
@@ -43735,8 +43714,9 @@
             "name": "status",
             "in": "path",
             "description": "The status of the voucher.",
-            "required": true,
             "schema": {
+              "maximum": 1,
+              "minimum": 0,
               "type": "integer",
               "description": "The status of the voucher.",
               "format": "int32"
@@ -44161,8 +44141,9 @@
             "name": "status",
             "in": "path",
             "description": "The status of the voucher.",
-            "required": true,
             "schema": {
+              "maximum": 1,
+              "minimum": 0,
               "type": "integer",
               "description": "The status of the voucher.",
               "format": "int32"
@@ -52191,13 +52172,6 @@
             "format": "int32",
             "nullable": true
           },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitpunkt der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
-          },
           "eligibleForDiscount": {
             "type": "boolean",
             "description": "* Rabattfähig\r\n* eligible for discount"
@@ -52327,13 +52301,6 @@
             "description": "* Bestand in Auswahl\r\n* Stock in selection",
             "format": "double",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -52502,13 +52469,6 @@
             "format": "int32",
             "nullable": true
           },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
-          },
           "openMonday": {
             "type": "array",
             "items": {
@@ -52649,13 +52609,6 @@
             "description": "* Warengruppe-Nummer\r\n* Category number",
             "format": "int32",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -52697,13 +52650,6 @@
             "description": "* Farb-Nummer\r\n* Color number",
             "format": "int32",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -52755,13 +52701,6 @@
             "type": "string",
             "description": "* Land-Key\r\n* Country key",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -52861,13 +52800,6 @@
             "description": "* Eingelöster Wert\r\n* Redeemed value",
             "format": "double",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -52941,13 +52873,6 @@
             "description": "* Eingelöster Wert\r\n* Redeemed value",
             "format": "double",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -52981,13 +52906,6 @@
             "type": "string",
             "description": "* Währungs-Key\r\n* Currency key",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -53757,12 +53675,6 @@
             "format": "int32",
             "example": 13
           },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
-          },
           "hasCustomerCard": {
             "type": "boolean",
             "description": "* Kennzeichen, ob Kundenkarte vorhanden ist\r\n* Flag that defines whether the customer has a customer card"
@@ -53839,13 +53751,6 @@
             "description": "* Kunde-Nummer\r\n* Customer number",
             "format": "int32",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -54007,12 +53912,6 @@
             "type": "string",
             "description": "* Alternative Bon-Nummer (z.b. Auftragsnummer aus Web Auftrag)\r\n* Alternateive receipt number (e.g. Order number from web order)",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -54167,12 +54066,6 @@
             "type": "string",
             "description": "* Eindeutige ID\r\n* Unique identifier",
             "format": "uuid"
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -54203,12 +54096,6 @@
             "format": "int32",
             "nullable": true,
             "example": 1
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -54282,13 +54169,6 @@
             "description": "* Eingelöster Wert\r\n* Redeemed value",
             "format": "double",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -54374,13 +54254,6 @@
             "description": "* Funktion-Nummer\r\n* Function number",
             "format": "int32",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -54417,13 +54290,6 @@
             "description": "* Oberwarengruppe-Nummer\r\n* General category number",
             "format": "int32",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -54539,12 +54405,6 @@
             "type": "string",
             "description": "* Eindeutige ID\r\n* Unique identifier",
             "format": "uuid"
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -54660,12 +54520,6 @@
             "type": "string",
             "description": "* Eindeutige ID\r\n* Unique identifier",
             "format": "uuid"
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -54781,12 +54635,6 @@
             "type": "string",
             "description": "* Eindeutige ID\r\n* Unique identifier",
             "format": "uuid"
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -54930,12 +54778,6 @@
             "description": "* Web-Zahlungsart-Nummer\r\n* Web payment option number",
             "format": "int32",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -54963,13 +54805,6 @@
             "description": "* Label-Nummer\r\n* Label number",
             "format": "int32",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -55000,13 +54835,6 @@
             "description": "* Etikettentyp-Nummer\r\n* Label type number",
             "format": "int32",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -55034,13 +54862,6 @@
             "description": "* Hauptwarengruppe-Nummer\r\n* Main category number",
             "format": "int32",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -55068,13 +54889,6 @@
             "description": "* Hauptabteilung-Nummer\r\n* Main department number",
             "format": "int32",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -55102,13 +54916,6 @@
             "description": "* Material-Nummer\r\n* Material number",
             "format": "int32",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -55223,12 +55030,6 @@
             "type": "string",
             "description": "* Eindeutige ID\r\n* Unique identifier",
             "format": "uuid"
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -55343,12 +55144,6 @@
             "type": "string",
             "description": "* Eindeutige ID\r\n* Unique identifier",
             "format": "uuid"
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -55463,12 +55258,6 @@
             "type": "string",
             "description": "* Eindeutige ID\r\n* Unique identifier",
             "format": "uuid"
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -55583,12 +55372,6 @@
             "type": "string",
             "description": "* Eindeutige ID\r\n* Unique identifier",
             "format": "uuid"
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -55619,13 +55402,6 @@
             "description": "* Dessin-Nummer\r\n* Pattern number",
             "format": "int32",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -55712,13 +55488,6 @@
             "description": "* Rechnung-Nummer\r\n* Invoice number",
             "format": "int32",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -55742,13 +55511,6 @@
             "type": "string",
             "description": "* Eindeutige ID\r\n* Unique identifier",
             "format": "uuid",
-            "example": ""
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
             "example": ""
           }
         },
@@ -55815,12 +55577,6 @@
             "type": "string",
             "description": "* Eindeutige ID\r\n* Unique identifier",
             "format": "uuid"
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
           },
           "source": {
             "$ref": "#/components/schemas/api.Contract.PurchaseOrder.OrderSource"
@@ -56126,16 +55882,10 @@
             "description": "* Eindeutige ID\r\n* Unique identifier",
             "format": "uuid"
           },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
-          },
           "articleNumber": {
-            "type": "integer",
+            "type": "number",
             "description": "* Artikelnummer\r\n* Article number",
-            "format": "int32",
+            "format": "double",
             "nullable": true
           },
           "branchNumber": {
@@ -56444,12 +56194,6 @@
             "description": "* Anzahl der verteilten Waren\r\n* Amount of distributed goods",
             "format": "double",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -56591,13 +56335,6 @@
             "description": "* Gutscheinnotiz zur Information\r\n* Informational note",
             "nullable": true,
             "example": ""
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Eingelöster Wert\r\n* Redeemed amount",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -56658,13 +56395,6 @@
             "type": "string",
             "description": "* Eindeutige ID\r\n* Unique identifier",
             "format": "uuid",
-            "example": ""
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
             "example": ""
           }
         },
@@ -56805,13 +56535,6 @@
           "information": {
             "type": "string",
             "description": "* Gutscheinnotiz zur Information\r\n* Informational note",
-            "nullable": true,
-            "example": ""
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Eingelöster Wert\r\n* Redeemed amount",
-            "format": "date-time",
             "nullable": true,
             "example": ""
           }
@@ -56974,12 +56697,6 @@
           "alternativeReceiptNumber": {
             "type": "string",
             "description": "* Alternative Bon-Nummer (z.b. Auftragsnummer aus Web Auftrag)\r\n* Alternateive receipt number (e.g. Order number from web order)",
-            "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
             "nullable": true
           }
         },
@@ -57347,13 +57064,6 @@
             "type": "string",
             "description": "* Eindeutige ID\r\n* Unique identifier",
             "format": "uuid"
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -57448,12 +57158,6 @@
             "description": "* Warengruppe-Nummer\r\n* Category number",
             "format": "int32",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -57484,13 +57188,6 @@
             "description": "* Form-Nummer\r\n* Shape number",
             "format": "int32",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -57527,12 +57224,6 @@
             "type": "string",
             "description": "* Eindeutige ID\r\n* Unique identifier",
             "format": "uuid"
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -57559,12 +57250,6 @@
           "searchTerm": {
             "type": "string",
             "description": "* Suchwort der Versandart\r\n* Searchterm of the shipment option",
-            "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
             "nullable": true
           }
         },
@@ -57611,12 +57296,6 @@
             "description": "* Shop-Nummer\r\n* Shop number",
             "format": "int32",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -57647,13 +57326,6 @@
             "description": "* Position der Größe\r\n* Position of the size",
             "format": "int32",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -57676,13 +57348,6 @@
           "name": {
             "type": "string",
             "description": "* Name der Größengruppe\r\n* Name of the size class",
-            "nullable": true,
-            "example": ""
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
             "nullable": true,
             "example": ""
           }
@@ -57719,13 +57384,6 @@
           "name": {
             "type": "string",
             "description": "* Name des Größengangs\r\n* Name of the size group",
-            "nullable": true,
-            "example": ""
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
             "nullable": true,
             "example": ""
           }
@@ -57786,12 +57444,6 @@
             "type": "string",
             "description": "* Eindeutige ID der Artikelgröße\r\n* Unique id of the article size",
             "format": "uuid",
-            "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
             "nullable": true
           }
         },
@@ -57938,13 +57590,6 @@
             "description": "* Austrittsdatum\r\n* Exit date",
             "format": "date",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -58085,13 +57730,6 @@
             "description": "* Zahlungsbedingung-Nummer\r\n* Payment option number",
             "format": "int32",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -58136,12 +57774,6 @@
             "type": "string",
             "description": "* Eindeutige ID\r\n* Unique identifier",
             "format": "uuid"
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -58170,13 +57802,6 @@
           "name": {
             "type": "string",
             "description": "* Name der Zielgruppe\r\n* Name of the target group",
-            "nullable": true,
-            "example": ""
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
             "nullable": true,
             "example": ""
           }
@@ -58316,13 +57941,6 @@
           "information": {
             "type": "string",
             "description": "* Gutscheinnotiz zur Information\r\n* Informational note",
-            "nullable": true,
-            "example": ""
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
             "nullable": true,
             "example": ""
           }
@@ -58479,13 +58097,6 @@
             "description": "* Gültig von Datum\r\n* Valid from Date",
             "format": "date",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -58530,13 +58141,6 @@
             "description": "* Position\r\n* Position",
             "format": "int32",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -58581,13 +58185,6 @@
             "type": "string",
             "description": "* Wert\r\n* Value",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -58610,13 +58207,6 @@
             "type": "string",
             "description": "* Wert\r\n* Value",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -58667,13 +58257,6 @@
             "description": "* Reduzierter Verkaufspreis\r\n* Reduced sale price",
             "format": "double",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true,
-            "example": ""
           }
         },
         "additionalProperties": false
@@ -58931,12 +58514,6 @@
           "externalOrderNumber": {
             "type": "string",
             "description": "* Externe Auftrags-Nummer\r\n* External order number",
-            "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
             "nullable": true
           }
         },
@@ -59268,12 +58845,6 @@
             "type": "boolean",
             "description": "* Wenn dieses Flag gesetzt wird, wird ein vorhandener Gutschein um den entsprechenden Betrag aufgeladen\r\n* Set this flag to recharge an existing voucher with a specified amount",
             "nullable": true
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -59316,13 +58887,6 @@
           "searchTerm": {
             "type": "string",
             "description": "* Suchwort der Web-Zahlungsart\r\n* Searchterm of the web payment option",
-            "nullable": true,
-            "example": ""
-          },
-          "lastChange": {
-            "type": "string",
-            "description": "* Zeitstempel der letzten Änderung\r\n* Timestamp of the last change",
-            "format": "date-time",
             "nullable": true,
             "example": ""
           }
@@ -65350,7 +64914,7 @@
         },
         "additionalProperties": false
       },
-      "api.Module.Entities.Country.GetByNumberEndpoint+RequestModel": {
+      "api.Module.Entities.Country.GetByKeyKeyEndpoint+RequestModel": {
         "required": [
           "key"
         ],
@@ -65454,12 +65018,13 @@
       },
       "api.Module.Entities.Coupon.GetByCustomerNumberAndStatusEndpoint+RequestModel": {
         "required": [
-          "customerNumber",
-          "status"
+          "customerNumber"
         ],
         "type": "object",
         "properties": {
           "status": {
+            "maximum": 1,
+            "minimum": 0,
             "type": "integer",
             "description": "The status of the coupon.",
             "format": "int32"
@@ -65542,12 +65107,11 @@
         "additionalProperties": false
       },
       "api.Module.Entities.Coupon.GetByStatusEndpoint+RequestModel": {
-        "required": [
-          "status"
-        ],
         "type": "object",
         "properties": {
           "status": {
+            "maximum": 1,
+            "minimum": 0,
             "type": "integer",
             "description": "The status of the coupon.",
             "format": "int32"
@@ -65658,12 +65222,13 @@
       },
       "api.Module.Entities.Credit.GetByCustomerNumberAndStatusEndpoint+RequestModel": {
         "required": [
-          "customerNumber",
-          "status"
+          "customerNumber"
         ],
         "type": "object",
         "properties": {
           "status": {
+            "maximum": 1,
+            "minimum": 0,
             "type": "integer",
             "description": "The status of the credit.",
             "format": "int32"
@@ -65732,12 +65297,11 @@
         "additionalProperties": false
       },
       "api.Module.Entities.Credit.GetByStatusEndpoint+RequestModel": {
-        "required": [
-          "status"
-        ],
         "type": "object",
         "properties": {
           "status": {
+            "maximum": 1,
+            "minimum": 0,
             "type": "integer",
             "description": "The status of the credit.",
             "format": "int32"
@@ -71894,12 +71458,13 @@
       },
       "api.Module.Entities.Voucher.GetByCustomerNumberAndStatusEndpoint+RequestModel": {
         "required": [
-          "customerNumber",
-          "status"
+          "customerNumber"
         ],
         "type": "object",
         "properties": {
           "status": {
+            "maximum": 1,
+            "minimum": 0,
             "type": "integer",
             "description": "The status of the voucher.",
             "format": "int32"
@@ -71982,12 +71547,11 @@
         "additionalProperties": false
       },
       "api.Module.Entities.Voucher.GetByStatusEndpoint+RequestModel": {
-        "required": [
-          "status"
-        ],
         "type": "object",
         "properties": {
           "status": {
+            "maximum": 1,
+            "minimum": 0,
             "type": "integer",
             "description": "The status of the voucher.",
             "format": "int32"
@@ -73349,7 +72913,7 @@
     "securitySchemes": {
       "Bearer": {
         "type": "http",
-        "description": "Please use JWT with Bearer",
+        "description": "To obtain a token, send a POST request to the endpoint `https://auth.prohandel.cloud/api/v4/token`. The request body should include the login credentials provided by prohandel in JSON format. Ensure that the `apiKey` field contains the user's API key and the `secret` field contains the password.\n\n```json\n{\n  \"apiKey\": \"MaxMustermann\",\n  \"secret\": \"xxx\"\n}\n```\n\nUpon successful authentication, the server responds with a status code of 200 and provides the requested tokens. The response format includes the validity period in seconds.\n\n```json\n{\n  \"token\": {\n      \"value\": \"eyJhbGciOiJSUzI1NiIsImtpZCI6ImU1MGEwYjB...\",\n      \"name\": \"token\",\n      \"expiresIn\": 1800\n  },\n  \"refreshToken\": {\n      \"value\": \"eyJhbGciOiJSUzI1NiIsImtpZCI6ImU1MGEwYjB...\",\n      \"name\": \"refreshToken\",\n      \"expiresIn\": 86400\n  }\n},\n\"serverUrl\": \"https://api.prohandel.de\",\n\"requiredActions\": []\n```\n\n## Token lifetime\n\nEach token's validity period is determined by the `expiresIn` field in the token response. You may renew a token once at least half its lifetime has elapsed. **Excessive token renewal requests will result in access revocation.**\n\n## Token refresh\n\nA new token can be obtained either by using the login credentials or by utilizing the refresh token provided during the initial login. To refresh a token using the refresh token, send a POST request to `https://auth.prohandel.cloud/api/v4/token/refresh`, with the `refreshToken` sent in the Authorization header.\n\n```http\nAuthorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImU1MGEwYjB...\n```\n\n## Accessing Data\n\nWith the acquired access token, the third-party API can be accessed. The token must be included in the Authorization header field for each API request in the format `Bearer <token>`. If authorization fails, the server responds with a status code of 401, usually accompanied by a detailed error message in the `www-authenticate` header of the response.\n\n## Permissions\n\nDeveloper accounts include minimal permissions tailored to the individual use case. Permissions for each resource are categorized into create, read, update, and delete. Additional permissions can only be assigned by prohandel. Insufficient permissions for an endpoint query result in a server response with a status code of `403 - Forbidden`.",
         "scheme": "Bearer",
         "bearerFormat": "JWT"
       }
