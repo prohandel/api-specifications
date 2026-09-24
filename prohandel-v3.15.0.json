@@ -65572,25 +65572,25 @@
           },
           "discount": {
             "type": "number",
-            "description": "* Kunden-Rabatt\r\n* Customer discount",
+            "description": "* Allgemeiner Positionsrabatt. Ist bereits im Verkaufspreis (SalePrice) eingerechnet und dient rein informativ zur Dokumentation der Preisänderung.\r\n* General discount on the position. Already included in the sale price (SalePrice); purely informational to document the price change.",
             "format": "double",
             "nullable": true
           },
           "deduction": {
             "type": "number",
-            "description": "* Nachlass\r\n* Deduction",
+            "description": "* Nachlass / Abschlag auf die Position. Ist bereits im Verkaufspreis (SalePrice) eingerechnet und dient rein informativ zur Dokumentation der Preisänderung.\r\n* Deduction / price reduction on the position. Already included in the sale price (SalePrice); purely informational to document the price change.",
             "format": "double",
             "nullable": true
           },
           "staffDiscount": {
             "type": "number",
-            "description": "* Personal-Rabatt\r\n* Staff discount",
+            "description": "* Personal-Rabatt (mitarbeiterbezogen). Wird separat vom Verkaufspreis (SalePrice) abgezogen und auf dem Bon als eigene Rabattzeile ausgewiesen.\r\n* Staff discount. Deducted separately from the sale price (SalePrice) and shown as its own discount line on the receipt.",
             "format": "double",
             "nullable": true
           },
           "customerDiscount": {
             "type": "number",
-            "description": "* Kunden-Rabatt\r\n* Customer discount",
+            "description": "* Kunden-Rabatt (kundenbezogen). Wird separat vom Verkaufspreis (SalePrice) abgezogen und auf dem Bon als eigene Rabattzeile ausgewiesen.\r\n* Customer discount. Deducted separately from the sale price (SalePrice) and shown as its own discount line on the receipt.",
             "format": "double",
             "nullable": true
           },
@@ -65619,13 +65619,13 @@
           },
           "salePrice": {
             "type": "number",
-            "description": "* Verkaufspreis\r\n* Sale price",
+            "description": "* Verkaufspreis der Position (Positionsbetrag, brutto) vor Abzug der separat ausgewiesenen Rabatte (CustomerDiscount / StaffDiscount). Discount und Deduction sind hier bereits eingerechnet.\r\n* Sale price of the position (line amount, gross) before deducting the separately itemised discounts (CustomerDiscount / StaffDiscount). Discount and Deduction are already included here.",
             "format": "double",
             "nullable": true
           },
           "labelPrice": {
             "type": "number",
-            "description": "* Etikettenpreis\r\n* Price on the label",
+            "description": "* Ausgezeichneter Etikettenpreis des Artikels (Preis vor einer manuellen Preisänderung an der Kasse), nicht zwingend die Hersteller-UVP. Die Differenz zu SalePrice bildet die vorgenommene Preisänderung ab.\r\n* Ticketed label price of the article (price before a manual price change at the POS), not necessarily the manufacturer's RRP. The difference to SalePrice reflects the applied price change.",
             "format": "double",
             "nullable": true
           },
@@ -65666,6 +65666,24 @@
             "format": "date",
             "nullable": true
           },
+          "referenceReceiptNumber": {
+            "type": "integer",
+            "description": "* Bon-Nummer eines Referenzbons (z.B. Originalbon bei Retoure)\r\n* Receipt number of a reference receipt (e.g. original receipt when customer return)",
+            "format": "int32",
+            "nullable": true
+          },
+          "referenceReceiptDate": {
+            "type": "string",
+            "description": "* Bon-Datum eines Referenzbons (z.B. Originalbon bei Retoure)\r\n* Receipt date of a reference receipt (e.g. original receipt when customer return)",
+            "format": "date",
+            "nullable": true
+          },
+          "referenceReceiptPosition": {
+            "type": "integer",
+            "description": "* Position auf dem Bon eines Referenzbons (z.B. Originalbon bei Retoure)\r\n* Position on the receipt of a reference receipt (e.g. original receipt when customer return)",
+            "format": "int32",
+            "nullable": true
+          },
           "lastChange": {
             "type": "string",
             "description": "* Zeitpunkt der letzten �nderung\r\n* Timestamp of the last change",
@@ -65686,8 +65704,8 @@
           "Selection",
           "SelectionReturn",
           "POSMovement",
-          "POSFromBranch",
           "POSToBranch",
+          "POSFromBranch",
           "CashOpeningBalance",
           "CashDeposit",
           "CashWithdrawal",
